@@ -348,27 +348,47 @@ class YowAxolotlLayer(YowProtocolLayer):
         if not m or not serializedData:
             raise ValueError("Empty message")
 
+        managed = False
         node = encMessageProtocolEntity.toProtocolTreeNode()
+
         if m.HasField("sender_key_distribution_message"):
             axolotlAddress = AxolotlAddress(encMessageProtocolEntity.getParticipant(False), 0)
             self.handleSenderKeyDistributionMessage(m.sender_key_distribution_message, axolotlAddress)
-        elif m.HasField("conversation"):
+            managed = True
+
+        if m.HasField("conversation"):
             self.handleConversationMessage(node, m.conversation)
-        elif m.HasField("contact_message"):
+            managed = True
+
+        if m.HasField("contact_message"):
             self.handleContactMessage(node, m.contact_message)
-        elif m.HasField("url_message"):
+            managed = True
+
+        if m.HasField("url_message"):
             self.handleUrlMessage(node, m.url_message)
-        elif m.HasField("location_message"):
+            managed = True
+
+        if m.HasField("location_message"):
             self.handleLocationMessage(node, m.location_message)
-        elif m.HasField("image_message"):
+            managed = True
+
+        if m.HasField("image_message"):
             self.handleImageMessage(node, m.image_message)
-        elif m.HasField("document_message"):
+            managed = True
+
+        if m.HasField("document_message"):
             self.handleDocumentMessage(node, m.document_message)
-        elif m.HasField("video_message"):
+            managed = True
+
+        if m.HasField("video_message"):
             self.handleVideoMessage(node, m.video_message)
-        elif m.HasField("audio_message"):
+            managed = True
+
+        if m.HasField("audio_message"):
             self.handleAudioMessage(node, m.audio_message)
-        else:
+            managed = True
+
+        if not managed:
             print(m)
             raise ValueError("Unhandled")
 
